@@ -39,7 +39,7 @@ You can read about validator reward components in detail at https\://ethos.dev/
 
 ## API Description
 
-This API provides an endpoint to fetch detailed reward data for a specific Ethereum 2.0 validator. The API dynamically calculates rewards and penalties based on data fetched from the Ethereum 2.0 Beacon Chain. The endpoint accepts a validator public key or index as input and returns the reward details.
+This API provides a RESTful endpoint for fetching detailed reward data for an Ethereum 2.0 validator. It aggregates rewards and penalties dynamically from both the consensus and execution layers of the Ethereum Beacon Chain.
 
 ### **API Endpoint**
 ```bash
@@ -65,13 +65,12 @@ GET http://localhost:8080/validator-rewards/0x80000d79dbfde36d1dcb492e74c4b55adb
 
 ```json
 {
-  "validatorAddress": "0xabc...",
+  "validatorAddress": "831244",
   "totalRewards": "15.6 ETH",
-  "attestationRewards": "10.4 ETH",
-  "proposalRewards": "3.5 ETH",
-  "syncCommitteeRewards": "1.7 ETH",
-  "transactionFeeRewards": "0.8 ETH",
-  "penalties": "-0.3 ETH",
+  "1-Day Rewards": "0.8 ETH",
+  "7-Day Rewards": "5.6 ETH",
+  "31-Day Rewards": "12.0 ETH",
+  "365-Day Rewards": "15.6 ETH"
 }
 ```
 
