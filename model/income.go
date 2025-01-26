@@ -1,33 +1,38 @@
 package model
 
-type Income struct {
-    AttestationHeadReward          float64 `json:"attestation_head_reward"`
-    AttestationSourcePenalty       float64 `json:"attestation_source_penalty"`
-    AttestationSourceReward        float64 `json:"attestation_source_reward"`
-    AttestationTargetPenalty       float64 `json:"attestation_target_penalty"`
-    AttestationTargetReward        float64 `json:"attestation_target_reward"`
-    FinalityDelayPenalty           float64 `json:"finality_delay_penalty"`
-    ProposalsMissed                int     `json:"proposals_missed"`
-    ProposerAttestationInclusionReward float64 `json:"proposer_attestation_inclusion_reward"`
-    ProposerSlashingInclusionReward    float64 `json:"proposer_slashing_inclusion_reward"`
-    ProposerSyncInclusionReward        float64 `json:"proposer_sync_inclusion_reward"`
-    SlashingPenalty                   float64 `json:"slashing_penalty"`
-    SlashingReward                    float64 `json:"slashing_reward"`
-    SyncCommitteePenalty              float64 `json:"sync_committee_penalty"`
-    SyncCommitteeReward               float64 `json:"sync_committee_reward"`
-    TxFeeRewardWei                    string  `json:"tx_fee_reward_wei"`
+
+
+type ConsensusPerformance struct {
+    Balance        int64    `json:"balance"`
+    Performance1d        int64    `json:"performance1d"`
+    Performance31d        int64    `json:"performance31d"`
+    Performance365d        int64    `json:"performance365d"`
+    Performance7d        int64    `json:"performance7d"`
+    PerformanceToday        int64    `json:"performancetoday"`
+    PerformanceTotal        int64    `json:"performancetotal"`
+    Rank7d        int64    `json:"rank7d"`
+    ValidatorIndex        int64    `json:"validatorindex"`
 }
 
-type IncomeDetail struct {
-    Epoch        int    `json:"epoch"`
-    Income       Income `json:"income"`
-    ValidatorIndex int  `json:"validatorindex"`
-    Week         int    `json:"week"`
-    WeekEnd      string `json:"week_end"`
-    WeekStart    string `json:"week_start"`
+type ExecutionPerformance struct{
+    Performance1d        int64    `json:"performance1d"`
+    Performance7d        int64    `json:"performance7d"`
+    Performance31d        int64    `json:"performance31d"`
+    Performance365d        int64    `json:"performance365d"`
+    PerformanceTotal        int64    `json:"performancetotal"`
+    ValidatorIndex        int64    `json:"validatorindex"`
+
 }
 
-type ApiResponse struct {
-    Data   []IncomeDetail `json:"data"`
+
+
+type ApiResponseConsensus struct {
+    Status string         `json:"status"`
+    Data   []ConsensusPerformance `json:"data"`
+
+}
+
+type ApiResponseExecution struct {
+    Data   []ExecutionPerformance `json:"data"`
     Status string         `json:"status"`
 }

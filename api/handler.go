@@ -3,45 +3,67 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
 
 func GetValidatorRewards(c *gin.Context) {
     validatorIndexOrPubKey := c.Param("validator")
 
 
-    incomeDetails, err := FetchIncomeDetails(validatorIndexOrPubKey)
-	wrappedErr := fmt.Errorf("additional context: %w", err)
-	fmt.Println(wrappedErr)
+    ConsensusPerformance, err := ConsensusPerformance(validatorIndexOrPubKey)
+	wrappedErrC := fmt.Errorf("additional context: %w", err)
+	fmt.Println(wrappedErrC)
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching income details"})
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching Consensus details"})
+        return
+    }
+    //fmt.Printf("%+v\n", ConsensusPerformance)
+    var CPerformance1d, CPerformance31d, CPerformance365d, CPerformance7d,  CPerformanceTotal  float64
+
+    for _, detail := range ConsensusPerformance.Data {    
+    CPerformance1d += float64(detail.Performance1d)/1e9
+    CPerformance31d += float64(detail.Performance31d)/1e9
+    CPerformance365d += float64(detail.Performance365d)/1e9
+    CPerformance7d += float64(detail.Performance7d)/1e9
+    CPerformanceTotal += float64(detail.PerformanceTotal)/1e9
+    }
+    fmt.Printf("%f\n", CPerformanceTotal)
+
+
+    ExecutionPerformance, err := ExecutionPerformance(validatorIndexOrPubKey)
+	wrappedErrE := fmt.Errorf("additional context: %w", err)
+	fmt.Println(wrappedErrE)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching Execution details"})
         return
     }
 
-    var totalRewards, attestationRewards, proposalRewards, syncCommitteeRewards, transactionFeeRewards, penalties float64
+    var EPerformance1d, EPerformance31d, EPerformance365d, EPerformance7d,  EPerformanceTotal  float64
 
-    for _, detail := range incomeDetails.Data {
-        income := detail.Income
-        attestationRewards += income.AttestationHeadReward + income.AttestationSourceReward + income.AttestationTargetReward
-        proposalRewards += income.ProposerAttestationInclusionReward + income.ProposerSlashingInclusionReward + income.ProposerSyncInclusionReward
-        syncCommitteeRewards += income.SyncCommitteeReward
-        txFeeReward, _ := strconv.ParseFloat(income.TxFeeRewardWei, 64)
-        transactionFeeRewards += txFeeReward / 1e18
-        penalties -= (income.AttestationSourcePenalty + income.AttestationTargetPenalty + income.FinalityDelayPenalty + income.SlashingPenalty + income.SyncCommitteePenalty)
+    for _, detail := range ExecutionPerformance.Data {    
+    EPerformance1d += float64(detail.Performance1d)/1e18
+    EPerformance7d += float64(detail.Performance7d)/1e18
+    EPerformance31d += float64(detail.Performance31d)/1e18
+    EPerformance365d += float64(detail.Performance365d)/1e18
+    EPerformanceTotal += float64(detail.PerformanceTotal)/1e18
     }
 
-    totalRewards = attestationRewards + proposalRewards + syncCommitteeRewards + transactionFeeRewards + penalties
+    TotalRewards := CPerformanceTotal + EPerformanceTotal
+    Rewards1D := CPerformance1d + EPerformance1d
+    Rewards7D := CPerformance7d + EPerformance7d
+    Rewards31D := CPerformance31d + EPerformance31d
+    Rewards365D := CPerformance365d + EPerformance365d
+
 
     response := map[string]interface{}{
         "validatorAddress":        validatorIndexOrPubKey,
-        "totalRewards":            fmt.Sprintf("%.4f ETH", totalRewards),
-        "attestationRewards":      fmt.Sprintf("%.4f ETH", attestationRewards),
-        "proposalRewards":         fmt.Sprintf("%.4f ETH", proposalRewards),
-        "syncCommitteeRewards":    fmt.Sprintf("%.4f ETH", syncCommitteeRewards),
-        "transactionFeeRewards":   fmt.Sprintf("%.4f ETH", transactionFeeRewards),
-        "penalties":               fmt.Sprintf("%.4f ETH", penalties),
+        "Total Rewards":            fmt.Sprintf("%.4f ETH", TotalRewards),
+        "1-Day Rewards":      fmt.Sprintf("%.4f ETH", Rewards1D),
+        "7 Day Rewards":         fmt.Sprintf("%.4f ETH", Rewards7D),
+        "31 Day Rewards":    fmt.Sprintf("%.4f ETH", Rewards31D),
+        "365 Day Rewards":   fmt.Sprintf("%.4f ETH", Rewards365D),
     }
 
     c.JSON(http.StatusOK, response)
